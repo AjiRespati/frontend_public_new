@@ -32,3 +32,5 @@ npx expo install react-native-screens react-native-safe-area-context
 
 npx expo start --web
 ```
+
+## 3. Login Screen and initial navigation, api, store
