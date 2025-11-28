@@ -5,6 +5,7 @@ import { useProducts } from "../api/useProducts";
 import { useCartStore } from "../store/cartStore";
 import api from "../api/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "../store/authStore";
 
 export default function SalesScreen() {
   const { data: products, isLoading } = useProducts();
@@ -18,6 +19,7 @@ export default function SalesScreen() {
     total,
   } = useCartStore();
   const queryClient = useQueryClient();
+  const { logout } = useAuthStore();
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
@@ -41,6 +43,7 @@ export default function SalesScreen() {
         {items.length > 0 && (
           <Appbar.Action icon="delete" onPress={clearCart} />
         )}
+        <Appbar.Action icon="logout" onPress={logout} />
       </Appbar.Header>
 
       <FlatList

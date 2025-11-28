@@ -18,11 +18,13 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { useAuthStore } from "../store/authStore";
 
 export default function ReportsScreen() {
   const [range, setRange] = useState(7);
   const { data, isLoading, error, refetch } = useSalesStats(range);
   const screenWidth = Dimensions.get("window").width;
+  const { logout } = useAuthStore();
 
   const handleChangeRange = (value: string) => {
     const num = parseInt(value, 10);
@@ -59,6 +61,7 @@ export default function ReportsScreen() {
     <ScrollView style={ { flex: 1 } }>
       <Appbar.Header>
         <Appbar.Content title="Reports & Analytics" />
+      <Appbar.Action icon="logout" onPress={logout} />
       </Appbar.Header>
 
       <View style={ { padding: 16 } }>

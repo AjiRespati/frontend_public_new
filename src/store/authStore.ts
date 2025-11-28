@@ -58,9 +58,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      await api.post("/auth/logout");
-    } catch {}
+      const { accessToken } = get();
+      if (accessToken) {
+        await api.post("/auth/logout"); // backend clears refresh token
+      }
+    } catch (e) {
+      console.warn("Logout error:", e);
+    }
+
+    // 🔥 Remove all local traces
     await storage.multiRemove(["accessToken", "refreshToken"]);
+    delete api.defaults.headers.common["Authorization"];
     set({ accessToken: null, refreshToken: null, user: null });
   },
 
