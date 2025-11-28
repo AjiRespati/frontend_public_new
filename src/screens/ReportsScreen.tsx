@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ScrollView, View, Dimensions } from "react-native";
 import {
   Appbar,
@@ -6,6 +6,7 @@ import {
   Text,
   ActivityIndicator,
   Divider,
+  SegmentedButtons,
 } from "react-native-paper";
 import { useSalesStats } from "../api/useSalesStats";
 import {
@@ -19,21 +20,28 @@ import {
 } from "recharts";
 
 export default function ReportsScreen() {
-  const { data, isLoading, error } = useSalesStats();
+  const [range, setRange] = useState(7);
+  const { data, isLoading, error, refetch } = useSalesStats(range);
   const screenWidth = Dimensions.get("window").width;
+
+  const handleChangeRange = (value: string) => {
+    const num = parseInt(value, 10);
+    setRange(num);
+    refetch();
+  };
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator animating={true} />
+      <View style={ { flex: 1, justifyContent: "center" } }>
+        <ActivityIndicator animating={ true } />
       </View>
     );
   }
 
   if (error || !data) {
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <Text style={{ textAlign: "center", color: "red" }}>
+      <View style={ { flex: 1, justifyContent: "center" } }>
+        <Text style={ { textAlign: "center", color: "red" } }>
           Failed to load reports.
         </Text>
       </View>
@@ -48,39 +56,51 @@ export default function ReportsScreen() {
   const topProducts = data.topProducts || [];
 
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView style={ { flex: 1 } }>
       <Appbar.Header>
         <Appbar.Content title="Reports & Analytics" />
       </Appbar.Header>
 
-      {/* Summary Cards */}
-      <View style={{ padding: 16 }}>
-        <Card style={{ marginBottom: 16 }}>
+      <View style={ { padding: 16 } }>
+        {/* Range Selector */ }
+        <SegmentedButtons
+          value={ String(range) }
+          onValueChange={ handleChangeRange }
+          buttons={ [
+            { value: "7", label: "7d" },
+            { value: "30", label: "30d" },
+            { value: "90", label: "90d" },
+          ] }
+          style={ { marginBottom: 16 } }
+        />
+
+        {/* Summary Cards */ }
+        <Card style={ { marginBottom: 16 } }>
           <Card.Content>
             <Text variant="titleMedium">Total Sales</Text>
-            <Text variant="headlineMedium">{summary.totalSales || 0}</Text>
+            <Text variant="headlineMedium">{ summary.totalSales || 0 }</Text>
           </Card.Content>
         </Card>
 
-        <Card style={{ marginBottom: 16 }}>
+        <Card style={ { marginBottom: 16 } }>
           <Card.Content>
             <Text variant="titleMedium">Total Revenue</Text>
             <Text variant="headlineMedium">
-              ${Number(summary.totalRevenue || 0).toFixed(2)}
+              ${ Number(summary.totalRevenue || 0).toFixed(2) }
             </Text>
           </Card.Content>
         </Card>
 
-        <Divider style={{ marginVertical: 16 }} />
+        <Divider style={ { marginVertical: 16 } } />
 
-        {/* Revenue Chart */}
-        <Text variant="titleMedium" style={{ marginBottom: 8 }}>
-          Revenue (Last 7 Days)
+        {/* Revenue Chart */ }
+        <Text variant="titleMedium" style={ { marginBottom: 8 } }>
+          Revenue (Last { range } Days)
         </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={{ height: 250, width: Math.max(600, screenWidth - 32) }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+          <View style={ { height: 250, width: Math.max(600, screenWidth - 32) } }>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailySales}>
+              <BarChart data={ dailySales }>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
@@ -91,27 +111,27 @@ export default function ReportsScreen() {
           </View>
         </ScrollView>
 
-        <Divider style={{ marginVertical: 16 }} />
+        <Divider style={ { marginVertical: 16 } } />
 
-        {/* Top Products */}
-        <Text variant="titleMedium" style={{ marginBottom: 8 }}>
+        {/* Top Products */ }
+        <Text variant="titleMedium" style={ { marginBottom: 8 } }>
           Top Products
         </Text>
-        {topProducts.length === 0 ? (
+        { topProducts.length === 0 ? (
           <Text>No product sales yet.</Text>
         ) : (
           topProducts.map((p: any, idx: number) => (
-            <Card key={idx} style={{ marginBottom: 10 }}>
+            <Card key={ idx } style={ { marginBottom: 10 } }>
               <Card.Content>
                 <Text variant="titleMedium">
-                  {p.Product?.name || "Unknown Product"}
+                  { p.Product?.name || "Unknown Product" }
                 </Text>
-                <Text>Total Sold: {p.totalSold}</Text>
-                <Text>Revenue: ${Number(p.revenue).toFixed(2)}</Text>
+                <Text>Total Sold: { p.totalSold }</Text>
+                <Text>Revenue: ${ Number(p.revenue).toFixed(2) }</Text>
               </Card.Content>
             </Card>
           ))
-        )}
+        ) }
       </View>
     </ScrollView>
   );
