@@ -45,3 +45,10 @@ Create the files
 ## 5. Add Main App Features
 
 Inital Products, Sales, Reports screens
+
+## 6. Products CRUD
+
+npx expo install expo-image-picker
+npm i react-hook-form yup @hookform/resolvers
+
+Create the files
