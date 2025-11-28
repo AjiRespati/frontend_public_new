@@ -6,38 +6,30 @@ type AuthState = {
   user: any | null;
   accessToken: string | null;
   refreshToken: string | null;
+  refreshTimer: ReturnType<typeof setInterval> | null;
   hydrated: boolean;
   hydrate: () => Promise<void>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
+  startSilentRefresh: () => void;
+  stopSilentRefresh: () => void;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
   refreshToken: null,
+  refreshTimer: null,
   hydrated: false,
 
-  // 🧙 Hydrate from storage (runs at app boot)
   hydrate: async () => {
-    // For web: synchronous first-read
-    const webAccess = storage.getSync("accessToken");
-    const webRefresh = storage.getSync("refreshToken");
-    if (webAccess && webRefresh) {
-      set({ accessToken: webAccess, refreshToken: webRefresh });
-      api.defaults.headers.common["Authorization"] = `Bearer ${webAccess}`;
-    }
-
-    // Async fallback (mobile)
     const access = await storage.getItem("accessToken");
     const refresh = await storage.getItem("refreshToken");
-
     if (access && refresh) {
       set({ accessToken: access, refreshToken: refresh });
       api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
     }
-
     set({ hydrated: true });
   },
 
@@ -45,10 +37,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const res = await api.post("/auth/login", { email, password });
       const { accessToken, refreshToken, user } = res.data;
+
       await storage.setItem("accessToken", accessToken);
       await storage.setItem("refreshToken", refreshToken);
       api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       set({ user, accessToken, refreshToken });
+      get().startSilentRefresh();
       return true;
     } catch (err) {
       console.error("Login failed:", err);
@@ -58,18 +52,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      const { accessToken } = get();
-      if (accessToken) {
-        await api.post("/auth/logout"); // backend clears refresh token
-      }
-    } catch (e) {
-      console.warn("Logout error:", e);
-    }
-
-    // 🔥 Remove all local traces
+      await api.post("/auth/logout");
+    } catch {}
     await storage.multiRemove(["accessToken", "refreshToken"]);
-    delete api.defaults.headers.common["Authorization"];
-    set({ accessToken: null, refreshToken: null, user: null });
+    const timer = get().refreshTimer;
+    if (timer) clearInterval(timer);
+    set({ accessToken: null, refreshToken: null, user: null, refreshTimer: null });
   },
 
   refreshSession: async () => {
@@ -86,8 +74,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ accessToken, refreshToken: newRefresh });
       return true;
     } catch (e) {
-      console.error("Refresh session failed", e);
+      console.error("Silent refresh failed:", e);
+      get().logout();
       return false;
     }
+  },
+
+  startSilentRefresh: () => {
+    const currentTimer = get().refreshTimer;
+    if (currentTimer) clearInterval(currentTimer);
+
+    const timer = setInterval(async () => {
+      const success = await get().refreshSession();
+      if (!success) {
+        console.warn("⚠️ Auto token refresh failed — logging out");
+        get().logout();
+      }
+    }, 10 * 60 * 1000); // 10 min
+
+    set({ refreshTimer: timer });
+  },
+
+  stopSilentRefresh: () => {
+    const timer = get().refreshTimer;
+    if (timer) clearInterval(timer);
+    set({ refreshTimer: null });
   },
 }));

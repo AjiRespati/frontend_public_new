@@ -5,18 +5,19 @@ import RootNavigator from "./src/navigation/RootNavigator";
 import { useAuthStore } from "./src/store/authStore";
 
 export default function App() {
-  const { hydrate, refreshSession, hydrated } = useAuthStore();
+  const { hydrate, refreshSession, hydrated, startSilentRefresh } = useAuthStore();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     (async () => {
       await hydrate();
-      await refreshSession();
+      const refreshed = await refreshSession();
+      if (refreshed) startSilentRefresh();
       setReady(true);
     })();
   }, []);
 
-  if (!hydrated || !ready) return null; // can replace with splash/loading
+  if (!hydrated || !ready) return null; // loading splash placeholder
   return (
     <ReactQueryProvider>
       <PaperProvider>
