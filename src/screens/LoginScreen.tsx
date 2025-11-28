@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { TextInput, Button, Text, useTheme } from "react-native-paper";
 import { useAuthStore } from "../store/authStore";
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }: any) {
   const { login } = useAuthStore();
   const theme = useTheme();
 
@@ -66,6 +66,24 @@ export default function LoginScreen() {
       >
         Sign In
       </Button>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Register")}
+        style={{ marginTop: 20 }}
+      >
+        <Text style={{ textAlign: "center", color: theme.colors.primary }}>
+          Create an Account
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate("ForgotPassword")}
+        style={{ marginTop: 10 }}
+      >
+        <Text style={{ textAlign: "center", color: theme.colors.primary }}>
+          Forgot Password?
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

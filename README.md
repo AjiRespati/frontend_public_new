@@ -34,3 +34,10 @@ npx expo start --web
 ```
 
 ## 3. Login Screen and initial navigation, api, store
+
+Update the tsconfig.json then restart TS server.
+Create initial files.
+
+## $. Add Login, Register, Forgot Password screens
+
+Create the files
