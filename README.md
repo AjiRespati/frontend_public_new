@@ -38,6 +38,10 @@ npx expo start --web
 Update the tsconfig.json then restart TS server.
 Create initial files.
 
-## $. Add Login, Register, Forgot Password screens
+## 4. Add Login, Register, Forgot Password screens
 
 Create the files
+
+## 5. Add Main App Features
+
+Inital Products, Sales, Reports screens
