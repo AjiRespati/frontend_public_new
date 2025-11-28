@@ -52,3 +52,5 @@ npx expo install expo-image-picker
 npm i react-hook-form yup @hookform/resolvers
 
 Create the files
+
+## 7. Add full Sales/Checkout cart system
