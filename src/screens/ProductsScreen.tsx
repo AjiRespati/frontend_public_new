@@ -4,6 +4,8 @@ import { Text, Appbar, ActivityIndicator, Card, IconButton } from "react-native-
 import { useProducts } from "../api/useProducts";
 import api from "../api/client";
 import { useQueryClient } from "@tanstack/react-query";
+import AppHeader from "../components/AppHeader";
+import { globalStyles } from "../utils/globalStyles";
 
 export default function ProductsScreen({ navigation }: any) {
   const { data, isLoading, error } = useProducts();
@@ -11,18 +13,20 @@ export default function ProductsScreen({ navigation }: any) {
 
   const handleDelete = async (id: number) => {
     await api.delete(`/products/${id}`);
-    queryClient.invalidateQueries({queryKey : ["products"]});
+    queryClient.invalidateQueries({ queryKey: ["products"] });
   };
 
   return (
     <View style={ { flex: 1 } }>
-      <Appbar.Header>
+      <AppHeader title="Products" />
+
+      {/* <Appbar.Header>
         <Appbar.Content title="Products" />
         <Appbar.Action
           icon="plus"
           onPress={ () => navigation.navigate("ProductCreate") }
         />
-      </Appbar.Header>
+      </Appbar.Header> */}
 
       { isLoading && (
         <View style={ { flex: 1, justifyContent: "center" } }>
@@ -42,7 +46,8 @@ export default function ProductsScreen({ navigation }: any) {
           keyExtractor={ (item) => String(item.id) }
           contentContainerStyle={ { padding: 10 } }
           renderItem={ ({ item }) => (
-            <Card style={ { marginBottom: 10 } }>
+            <Card style={ [globalStyles.card, { marginBottom: 16 }] }>
+              <Card.Cover source={ { uri: item.image } } style={ { borderRadius: 16 } } />
               <Card.Title
                 title={ item.name }
                 subtitle={ `Stock: ${item.stock}` }
@@ -60,7 +65,7 @@ export default function ProductsScreen({ navigation }: any) {
                 ) }
               />
               <Card.Content>
-                <Text>Price: ${ item.price }</Text>
+                <Text variant="titleMedium" style={ { color: "#555", marginTop: 8 } }>Price: ${ item.price }</Text>
               </Card.Content>
             </Card>
           ) }

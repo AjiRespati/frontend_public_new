@@ -104,7 +104,7 @@ export default function ReportsScreen() {
           <View style={ { height: 250, width: Math.max(600, screenWidth - 32) } }>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ dailySales }>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid stroke="#F3F4F6"  strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />

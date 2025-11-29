@@ -1,89 +1,67 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity } from "react-native";
-import { TextInput, Button, Text, useTheme } from "react-native-paper";
+import { View } from "react-native";
+import { Text, Button, TextInput, HelperText } from "react-native-paper";
 import { useAuthStore } from "../store/authStore";
+import { globalStyles } from "../utils/globalStyles";
 
 export default function LoginScreen({ navigation }: any) {
   const { login } = useAuthStore();
-  const theme = useTheme();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
     setLoading(true);
     const success = await login(email, password);
     setLoading(false);
-    if (!success) setError("Invalid credentials");
+    if (!success) setError("Invalid email or password");
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        padding: 20,
-        backgroundColor: theme.colors.background,
-      }}
-    >
-      <Text
-        variant="headlineMedium"
-        style={{ textAlign: "center", marginBottom: 24 }}
-      >
-        Aji Respati POS
-      </Text>
-
-      <TextInput
-        label="Email"
-        mode="outlined"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        style={{ marginBottom: 12 }}
-      />
-      <TextInput
-        label="Password"
-        mode="outlined"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={{ marginBottom: 16 }}
-      />
-
-      {error ? (
-        <Text style={{ color: "red", textAlign: "center", marginBottom: 12 }}>
-          {error}
+    <View style={[globalStyles.screen, { justifyContent: "center" }]}>
+      <View style={[globalStyles.card, { paddingVertical: 32 }]}>
+        <Text style={[globalStyles.title, { textAlign: "center" }]}>Welcome Back 👋</Text>
+        <Text style={{ textAlign: "center", color: "#666", marginBottom: 20 }}>
+          Sign in to continue your POS journey.
         </Text>
-      ) : null}
 
-      <Button
-        mode="contained"
-        onPress={handleLogin}
-        loading={loading}
-        disabled={loading}
-      >
-        Sign In
-      </Button>
+        <TextInput
+          label="Email"
+          mode="outlined"
+          value={email}
+          onChangeText={setEmail}
+          style={globalStyles.input}
+        />
+        <TextInput
+          label="Password"
+          mode="outlined"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          style={globalStyles.input}
+        />
 
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Register")}
-        style={{ marginTop: 20 }}
-      >
-        <Text style={{ textAlign: "center", color: theme.colors.primary }}>
-          Create an Account
-        </Text>
-      </TouchableOpacity>
+        {error ? <HelperText type="error">{error}</HelperText> : null}
 
-      <TouchableOpacity
-        onPress={() => navigation.navigate("ForgotPassword")}
-        style={{ marginTop: 10 }}
-      >
-        <Text style={{ textAlign: "center", color: theme.colors.primary }}>
-          Forgot Password?
-        </Text>
-      </TouchableOpacity>
+        <Button
+          mode="contained"
+          loading={loading}
+          onPress={handleLogin}
+          style={[globalStyles.button, { backgroundColor: "#FF5A5F" }]}
+          labelStyle={{ fontWeight: "600", color: "#FFF" }}
+        >
+          Sign In
+        </Button>
+
+        <Button
+          onPress={() => navigation.navigate("Register")}
+          textColor="#FF5A5F"
+          style={{ marginTop: 16 }}
+        >
+          Create Account
+        </Button>
+      </View>
     </View>
   );
 }

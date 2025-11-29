@@ -10,24 +10,24 @@ import AppNavigator from "./AppNavigator";
 
 const Stack = createNativeStackNavigator();
 
-export default function RootNavigator() {
+export default function RootNavigator({ onLayout }: any) {
   const { accessToken } = useAuthStore();
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {accessToken ? (
-          <Stack.Screen name="App" component={AppNavigator} />
+    <NavigationContainer onReady={ onLayout }>
+      <Stack.Navigator screenOptions={ { headerShown: false } }>
+        { accessToken ? (
+          <Stack.Screen name="App" component={ AppNavigator } />
         ) : (
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Login" component={ LoginScreen } />
+            <Stack.Screen name="Register" component={ RegisterScreen } />
             <Stack.Screen
               name="ForgotPassword"
-              component={ForgotPasswordScreen}
+              component={ ForgotPasswordScreen }
             />
           </>
-        )}
+        ) }
       </Stack.Navigator>
     </NavigationContainer>
   );
