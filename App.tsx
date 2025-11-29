@@ -5,14 +5,14 @@ import RootNavigator from "./src/navigation/RootNavigator";
 import { useAuthStore } from "./src/store/authStore";
 
 export default function App() {
-  const { hydrate, refreshSession, hydrated, startSilentRefresh } = useAuthStore();
+  const { hydrate, refreshSession, hydrated, scheduleRefresh } = useAuthStore();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     (async () => {
       await hydrate();
       const refreshed = await refreshSession();
-      if (refreshed) startSilentRefresh();
+      if (refreshed) scheduleRefresh();
       setReady(true);
     })();
   }, []);

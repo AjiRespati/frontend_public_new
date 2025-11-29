@@ -1,19 +1,22 @@
+import { jwtDecode } from "jwt-decode";
 import { create } from "zustand";
+
 import api from "../api/client";
 import storage from "../utils/storage";
+
+type DecodedToken = { exp: number };
 
 type AuthState = {
   user: any | null;
   accessToken: string | null;
   refreshToken: string | null;
-  refreshTimer: ReturnType<typeof setInterval> | null;
+  refreshTimer: ReturnType<typeof setTimeout> | null;
   hydrated: boolean;
   hydrate: () => Promise<void>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
-  startSilentRefresh: () => void;
-  stopSilentRefresh: () => void;
+  scheduleRefresh: () => void;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -29,6 +32,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (access && refresh) {
       set({ accessToken: access, refreshToken: refresh });
       api.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+      get().scheduleRefresh();
     }
     set({ hydrated: true });
   },
@@ -41,8 +45,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await storage.setItem("accessToken", accessToken);
       await storage.setItem("refreshToken", refreshToken);
       api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
       set({ user, accessToken, refreshToken });
-      get().startSilentRefresh();
+      get().scheduleRefresh();
       return true;
     } catch (err) {
       console.error("Login failed:", err);
@@ -53,10 +58,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     try {
       await api.post("/auth/logout");
-    } catch {}
+    } catch { }
     await storage.multiRemove(["accessToken", "refreshToken"]);
     const timer = get().refreshTimer;
-    if (timer) clearInterval(timer);
+    if (timer) clearTimeout(timer);
     set({ accessToken: null, refreshToken: null, user: null, refreshTimer: null });
   },
 
@@ -66,12 +71,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (!refreshToken) return false;
 
       const res = await api.post("/auth/refresh", { token: refreshToken });
-      const { accessToken, refreshToken: newRefresh } = res.data;
+      const { accessToken, refreshToken: newRefresh, user } = res.data;
 
       await storage.setItem("accessToken", accessToken);
       await storage.setItem("refreshToken", newRefresh);
       api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      set({ accessToken, refreshToken: newRefresh });
+      set({ accessToken, refreshToken: newRefresh, user });
+      get().scheduleRefresh();
+      console.log("🔁 Token refreshed silently");
       return true;
     } catch (e) {
       console.error("Silent refresh failed:", e);
@@ -80,24 +87,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  startSilentRefresh: () => {
-    const currentTimer = get().refreshTimer;
-    if (currentTimer) clearInterval(currentTimer);
-
-    const timer = setInterval(async () => {
-      const success = await get().refreshSession();
-      if (!success) {
-        console.warn("⚠️ Auto token refresh failed — logging out");
-        get().logout();
-      }
-    }, 10 * 60 * 1000); // 10 min
-
-    set({ refreshTimer: timer });
-  },
-
-  stopSilentRefresh: () => {
+  scheduleRefresh: () => {
+    const token = get().accessToken;
     const timer = get().refreshTimer;
-    if (timer) clearInterval(timer);
-    set({ refreshTimer: null });
+    if (timer) clearTimeout(timer);
+    if (!token) return;
+
+    try {
+      const { exp } = jwtDecode<DecodedToken>(token);
+      const expiresInMs = exp * 1000 - Date.now();
+      // Schedule one minute before expiry, minimum 30 s
+      const refreshDelay = Math.max(expiresInMs - 60 * 1000, 30 * 1000);
+
+      console.log(
+        `🕒 Access token expires in ${(expiresInMs / 1000).toFixed(
+          0
+        )} s → refreshing in ${(refreshDelay / 1000).toFixed(0)} s`
+      );
+
+      const newTimer = setTimeout(async () => {
+        await get().refreshSession();
+      }, refreshDelay);
+
+      set({ refreshTimer: newTimer });
+    } catch (err) {
+      console.error("Failed to decode access token", err);
+    }
   },
 }));
