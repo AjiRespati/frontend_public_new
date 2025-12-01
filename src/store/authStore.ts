@@ -2,6 +2,7 @@ import { jwtDecode } from "jwt-decode";
 import { create } from "zustand";
 
 import api from "../api/client";
+import { LoginResponse } from "../models/LoginResponse";
 import storage from "../utils/storage";
 
 type DecodedToken = { exp: number };
@@ -40,14 +41,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email, password) => {
     try {
       const res = await api.post("/auth/login", { email, password });
-      const { accessToken, refreshToken, user } = res.data;
+      // const { accessToken, refreshToken, user } = res.data;
 
+      const loginData = LoginResponse.fromJson(res.data);
+      const accessToken = loginData.accessToken;
+      const refreshToken = loginData.refreshToken;
+      const user = loginData.user;
+      
       await storage.setItem("accessToken", accessToken);
       await storage.setItem("refreshToken", refreshToken);
       api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
       set({ user, accessToken, refreshToken });
+
       get().scheduleRefresh();
+      
       return true;
     } catch (err) {
       console.error("Login failed:", err);
@@ -114,4 +122,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       console.error("Failed to decode access token", err);
     }
   },
+
 }));
