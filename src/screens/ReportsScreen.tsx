@@ -19,6 +19,8 @@ import {
   CartesianGrid,
 } from "recharts";
 import { useAuthStore } from "../store/authStore";
+import AppHeader from "../components/AppHeader";
+import { globalStyles } from "../utils/globalStyles";
 
 export default function ReportsScreen() {
   const [range, setRange] = useState(7);
@@ -59,82 +61,85 @@ export default function ReportsScreen() {
 
   return (
     <ScrollView style={ { flex: 1 } }>
-      <Appbar.Header>
+      <AppHeader title="Reports & Analytics" actions={ [{ icon: "logout", onPress: logout }] } />
+      {/* <Appbar.Header>
         <Appbar.Content title="Reports & Analytics" />
       <Appbar.Action icon="logout" onPress={logout} />
-      </Appbar.Header>
+      </Appbar.Header> */}
 
-      <View style={ { padding: 16 } }>
-        {/* Range Selector */ }
-        <SegmentedButtons
-          value={ String(range) }
-          onValueChange={ handleChangeRange }
-          buttons={ [
-            { value: "7", label: "7d" },
-            { value: "30", label: "30d" },
-            { value: "90", label: "90d" },
-          ] }
-          style={ { marginBottom: 16 } }
-        />
+      <View style={ [globalStyles.screen, { justifyContent: "center" }] }>
+        <View style={ [globalStyles.card, { paddingVertical: 32 }] }>
+          {/* Range Selector */ }
+          <SegmentedButtons
+            value={ String(range) }
+            onValueChange={ handleChangeRange }
+            buttons={ [
+              { value: "7", label: "7d" },
+              { value: "30", label: "30d" },
+              { value: "90", label: "90d" },
+            ] }
+            style={ { marginBottom: 16 } }
+          />
 
-        {/* Summary Cards */ }
-        <Card style={ { marginBottom: 16 } }>
-          <Card.Content>
-            <Text variant="titleMedium">Total Sales</Text>
-            <Text variant="headlineMedium">{ summary.totalSales || 0 }</Text>
-          </Card.Content>
-        </Card>
+          {/* Summary Cards */ }
+          <Card style={ { marginBottom: 16 } }>
+            <Card.Content>
+              <Text variant="titleMedium">Total Sales</Text>
+              <Text variant="headlineMedium">{ summary.totalSales || 0 }</Text>
+            </Card.Content>
+          </Card>
 
-        <Card style={ { marginBottom: 16 } }>
-          <Card.Content>
-            <Text variant="titleMedium">Total Revenue</Text>
-            <Text variant="headlineMedium">
-              ${ Number(summary.totalRevenue || 0).toFixed(2) }
-            </Text>
-          </Card.Content>
-        </Card>
+          <Card style={ { marginBottom: 16 } }>
+            <Card.Content>
+              <Text variant="titleMedium">Total Revenue</Text>
+              <Text variant="headlineMedium">
+                ${ Number(summary.totalRevenue || 0).toFixed(2) }
+              </Text>
+            </Card.Content>
+          </Card>
 
-        <Divider style={ { marginVertical: 16 } } />
+          <Divider style={ { marginVertical: 16 } } />
 
-        {/* Revenue Chart */ }
-        <Text variant="titleMedium" style={ { marginBottom: 8 } }>
-          Revenue (Last { range } Days)
-        </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
-          <View style={ { height: 250, width: Math.max(600, screenWidth - 32) } }>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ dailySales }>
-                <CartesianGrid stroke="#F3F4F6"  strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="revenue" fill="#6200ee" />
-              </BarChart>
-            </ResponsiveContainer>
-          </View>
-        </ScrollView>
+          {/* Revenue Chart */ }
+          <Text variant="titleMedium" style={ { marginBottom: 8 } }>
+            Revenue (Last { range } Days)
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={ false }>
+            <View style={ { height: 250, width: Math.max(600, screenWidth - 32) } }>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={ dailySales }>
+                  <CartesianGrid stroke="#F3F4F6" strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="revenue" fill="#6200ee" />
+                </BarChart>
+              </ResponsiveContainer>
+            </View>
+          </ScrollView>
 
-        <Divider style={ { marginVertical: 16 } } />
+          <Divider style={ { marginVertical: 16 } } />
 
-        {/* Top Products */ }
-        <Text variant="titleMedium" style={ { marginBottom: 8 } }>
-          Top Products
-        </Text>
-        { topProducts.length === 0 ? (
-          <Text>No product sales yet.</Text>
-        ) : (
-          topProducts.map((p: any, idx: number) => (
-            <Card key={ idx } style={ { marginBottom: 10 } }>
-              <Card.Content>
-                <Text variant="titleMedium">
-                  { p.Product?.name || "Unknown Product" }
-                </Text>
-                <Text>Total Sold: { p.totalSold }</Text>
-                <Text>Revenue: ${ Number(p.revenue).toFixed(2) }</Text>
-              </Card.Content>
-            </Card>
-          ))
-        ) }
+          {/* Top Products */ }
+          <Text variant="titleMedium" style={ { marginBottom: 8 } }>
+            Top Products
+          </Text>
+          { topProducts.length === 0 ? (
+            <Text>No product sales yet.</Text>
+          ) : (
+            topProducts.map((p: any, idx: number) => (
+              <Card key={ idx } style={ { marginBottom: 10 } }>
+                <Card.Content>
+                  <Text variant="titleMedium">
+                    { p.Product?.name || "Unknown Product" }
+                  </Text>
+                  <Text>Total Sold: { p.totalSold }</Text>
+                  <Text>Revenue: ${ Number(p.revenue).toFixed(2) }</Text>
+                </Card.Content>
+              </Card>
+            ))
+          ) }
+        </View>
       </View>
     </ScrollView>
   );

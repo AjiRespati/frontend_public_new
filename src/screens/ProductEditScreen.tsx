@@ -4,6 +4,8 @@ import { Appbar } from "react-native-paper";
 import ProductForm from "../components/ProductForm";
 import api from "../api/client";
 import { useQueryClient } from "@tanstack/react-query";
+import AppHeader from "../components/AppHeader";
+import { globalStyles } from "../utils/globalStyles";
 
 export default function ProductEditScreen({ route, navigation }: any) {
   const { product } = route.params;
@@ -31,16 +33,19 @@ export default function ProductEditScreen({ route, navigation }: any) {
   };
 
   return (
-    <View style={ { flex: 1 } }>
-      <Appbar.Header>
+    <View style={ [globalStyles.screen, { justifyContent: "center" }] }>
+      <View style={ [globalStyles.card, { paddingVertical: 32 }] }>
+    <AppHeader title="Edit Product" back/>
+      {/* <Appbar.Header>
         <Appbar.BackAction onPress={ () => navigation.goBack() } />
         <Appbar.Content title="Edit Product" />
-      </Appbar.Header>
+      </Appbar.Header> */}
       <ProductForm
         onSubmit={ handleSubmit }
         initialValues={ product }
         submitLabel="Update"
       />
+    </View>
     </View>
   );
 }

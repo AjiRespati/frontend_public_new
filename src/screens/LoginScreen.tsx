@@ -21,9 +21,13 @@ export default function LoginScreen({ navigation }: any) {
   return (
     <View style={[globalStyles.screen, { justifyContent: "center" }]}>
       <View style={[globalStyles.card, { paddingVertical: 32 }]}>
-        <Text style={[globalStyles.title, { textAlign: "center" }]}>Welcome Back 👋</Text>
-        <Text style={{ textAlign: "center", color: "#666", marginBottom: 20 }}>
-          Sign in to continue your POS journey.
+        <Text style={[globalStyles.title, { textAlign: "center" }]}>
+          Welcome Back 👋
+        </Text>
+        <Text
+          style={{ textAlign: "center", color: "#666", marginBottom: 20 }}
+        >
+          Sign in to continue your POS journey
         </Text>
 
         <TextInput

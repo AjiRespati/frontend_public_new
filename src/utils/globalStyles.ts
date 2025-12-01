@@ -5,14 +5,14 @@ export const globalStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FAFAFA",
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 12,
   },
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
@@ -25,15 +25,12 @@ export const globalStyles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#555",
+    color: "#666",
     marginBottom: 8,
   },
   input: {
     backgroundColor: "#FFF",
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    padding: 12,
     marginBottom: 12,
   },
   button: {

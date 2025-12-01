@@ -17,10 +17,11 @@ export default function ProductsScreen({ navigation }: any) {
   };
 
   return (
-    <View style={ { flex: 1 } }>
-      <AppHeader title="Products" />
+    <View style={ [globalStyles.screen, { justifyContent: "center" }] }>
+      <View style={ [globalStyles.card, { paddingVertical: 32 }] }>
+        <AppHeader title="Products" />
 
-      {/* <Appbar.Header>
+        {/* <Appbar.Header>
         <Appbar.Content title="Products" />
         <Appbar.Action
           icon="plus"
@@ -28,49 +29,50 @@ export default function ProductsScreen({ navigation }: any) {
         />
       </Appbar.Header> */}
 
-      { isLoading && (
-        <View style={ { flex: 1, justifyContent: "center" } }>
-          <ActivityIndicator animating={ true } />
-        </View>
-      ) }
+        { isLoading && (
+          <View style={ { flex: 1, justifyContent: "center" } }>
+            <ActivityIndicator animating={ true } />
+          </View>
+        ) }
 
-      { error && (
-        <Text style={ { color: "red", textAlign: "center" } }>
-          Failed to load products
-        </Text>
-      ) }
+        { error && (
+          <Text style={ { color: "red", textAlign: "center" } }>
+            Failed to load products
+          </Text>
+        ) }
 
-      { data && (
-        <FlatList
-          data={ data }
-          keyExtractor={ (item) => String(item.id) }
-          contentContainerStyle={ { padding: 10 } }
-          renderItem={ ({ item }) => (
-            <Card style={ [globalStyles.card, { marginBottom: 16 }] }>
-              <Card.Cover source={ { uri: item.image } } style={ { borderRadius: 16 } } />
-              <Card.Title
-                title={ item.name }
-                subtitle={ `Stock: ${item.stock}` }
-                right={ () => (
-                  <View style={ { flexDirection: "row" } }>
-                    <IconButton
-                      icon="pencil"
-                      onPress={ () => navigation.navigate("ProductEdit", { product: item }) }
-                    />
-                    <IconButton
-                      icon="delete"
-                      onPress={ () => handleDelete(item.id) }
-                    />
-                  </View>
-                ) }
-              />
-              <Card.Content>
-                <Text variant="titleMedium" style={ { color: "#555", marginTop: 8 } }>Price: ${ item.price }</Text>
-              </Card.Content>
-            </Card>
-          ) }
-        />
-      ) }
+        { data && (
+          <FlatList
+            data={ data }
+            keyExtractor={ (item) => String(item.id) }
+            contentContainerStyle={ { padding: 10 } }
+            renderItem={ ({ item }) => (
+              <Card style={ [globalStyles.card, { marginBottom: 16 }] }>
+                <Card.Cover source={ { uri: item.image } } style={ { borderRadius: 16 } } />
+                <Card.Title
+                  title={ item.name }
+                  subtitle={ `Stock: ${item.stock}` }
+                  right={ () => (
+                    <View style={ { flexDirection: "row" } }>
+                      <IconButton
+                        icon="pencil"
+                        onPress={ () => navigation.navigate("ProductEdit", { product: item }) }
+                      />
+                      <IconButton
+                        icon="delete"
+                        onPress={ () => handleDelete(item.id) }
+                      />
+                    </View>
+                  ) }
+                />
+                <Card.Content>
+                  <Text variant="titleMedium" style={ { color: "#555", marginTop: 8 } }>Price: ${ item.price }</Text>
+                </Card.Content>
+              </Card>
+            ) }
+          />
+        ) }
+      </View>
     </View>
   );
 }

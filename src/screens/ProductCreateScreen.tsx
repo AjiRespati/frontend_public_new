@@ -4,6 +4,7 @@ import { Appbar } from "react-native-paper";
 import ProductForm from "../components/ProductForm";
 import api from "../api/client";
 import { useQueryClient } from "@tanstack/react-query";
+import AppHeader from "../components/AppHeader";
 
 export default function ProductCreateScreen({ navigation }: any) {
   const queryClient = useQueryClient();
@@ -31,10 +32,12 @@ export default function ProductCreateScreen({ navigation }: any) {
 
   return (
     <View style={ { flex: 1 } }>
-      <Appbar.Header>
+      <AppHeader title="Add Product" />
+
+      {/* <Appbar.Header>
         <Appbar.BackAction onPress={ () => navigation.goBack() } />
         <Appbar.Content title="Add Product" />
-      </Appbar.Header>
+      </Appbar.Header> */}
       <ProductForm onSubmit={ handleSubmit } submitLabel="Create" />
     </View>
   );

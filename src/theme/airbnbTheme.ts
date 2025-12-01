@@ -5,8 +5,6 @@ export const airbnbTheme: MD3Theme = {
   roundness: 16,
   colors: {
     ...MD3LightTheme.colors,
-
-    // Airbnb palette
     primary: "#FF5A5F",
     secondary: "#00A699",
     background: "#FAFAFA",
@@ -17,8 +15,6 @@ export const airbnbTheme: MD3Theme = {
     onPrimary: "#FFFFFF",
     onSurface: "#333333",
   },
-
-  // MD3 now uses "typescale" instead of fonts
   fonts: {
     ...MD3LightTheme.fonts,
     displayLarge: { ...MD3LightTheme.fonts.displayLarge, fontFamily: "Poppins_700Bold" },
@@ -29,7 +25,6 @@ export const airbnbTheme: MD3Theme = {
     bodyMedium: { ...MD3LightTheme.fonts.bodyMedium, fontFamily: "Poppins_400Regular" },
     labelLarge: { ...MD3LightTheme.fonts.labelLarge, fontFamily: "Poppins_500Medium" },
   },
-
   version: 3,
   isV3: true,
 };
